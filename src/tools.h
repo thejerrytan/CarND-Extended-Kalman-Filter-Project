@@ -29,6 +29,9 @@ public:
   */
   MatrixXd CalculateJacobian(const VectorXd& x_state);
 
+  // Keeps track of rmse so far
+  VectorXd rmse;
+
 };
 
 #endif /* TOOLS_H_ */
