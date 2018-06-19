@@ -127,7 +127,7 @@ int main()
           
           estimations.push_back(estimate);
 
-          cout << "ground_truth = " << estimate << endl;
+          // cout << "ground_truth = " << estimate << endl;
 
           VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
 

@@ -22,7 +22,7 @@ FusionEKF::FusionEKF() {
   H_laser_ = MatrixXd(2, 4);
   Hj_ = MatrixXd(3, 4);
   VectorXd x_ = VectorXd(4);
-  MatrixXd Q_ = MatrixXd(4,4);
+  MatrixXd Q_ = MatrixXd::Zero(4,4);
   MatrixXd P_ = MatrixXd(4,4);
   MatrixXd F_ = MatrixXd(4,4);
 
@@ -52,10 +52,6 @@ FusionEKF::FusionEKF() {
   
   H_laser_ << 1, 0, 0, 0,
               0, 1, 0, 0;
-  Q_ << 0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0;
 
   // doesnt matter if we use laser or radar
   ekf_ = KalmanFilter();

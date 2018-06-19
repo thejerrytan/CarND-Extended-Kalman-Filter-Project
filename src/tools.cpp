@@ -5,6 +5,8 @@ using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
 
+const float EPS = 0.0001;
+
 Tools::Tools() {
   rmse = VectorXd(4);
   rmse << 0,0,0,0;
@@ -38,6 +40,8 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   // rmse /= estimations.size();
   // rmse = rmse.array().sqrt();
 
+  cout << "RMSE = " << rmse << endl;
+
   return rmse;
 }
 
@@ -59,23 +63,37 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   
   //check division by zero
   if (norm == 0 || norm2 == 0 || norm3 == 0) {
-      std::cout << "Error: divisionByZero" << std::endl;
-      return Hj;
+    std::cout << "Error: divisionByZero" << std::endl;
+    const double c2 = std::max(EPS, px*px + py*py); // equivalent of norm2
+    const double c1 = sqrt(c2); // equivalent of norm
+    const double c3 = pow(c1, 3); // equivalent of norm3
+    Hj(0,0) = px / c1;
+    Hj(0,1) = py / c1;
+    Hj(0,2) = 0;
+    Hj(0,3) = 0;
+    Hj(1,0) = -py / c2;
+    Hj(1,1) = px / c2;
+    Hj(1,2) = 0;
+    Hj(1,3) = 0;
+    Hj(2,0) = py * (vx * py - vy * px) / c3;
+    Hj(2,1) = px * (vy * px - vx * py) / c3;
+    Hj(2,2) = px / c1;
+    Hj(2,3) = py / c1;
+  } else {
+    //compute the Jacobian matrix
+    Hj(0,0) = px / norm;
+    Hj(0,1) = py / norm;
+    Hj(0,2) = 0;
+    Hj(0,3) = 0;
+    Hj(1,0) = -py / norm2;
+    Hj(1,1) = px / norm2;
+    Hj(1,2) = 0;
+    Hj(1,3) = 0;
+    Hj(2,0) = py * (vx * py - vy * px) / norm3;
+    Hj(2,1) = px * (vy * px - vx * py) / norm3;
+    Hj(2,2) = px / norm;
+    Hj(2,3) = py / norm;
   }
-  
-  //compute the Jacobian matrix
-  Hj(0,0) = px / norm;
-  Hj(0,1) = py / norm;
-  Hj(0,2) = 0;
-  Hj(0,3) = 0;
-  Hj(1,0) = -py / norm2;
-  Hj(1,1) = px / norm2;
-  Hj(1,2) = 0;
-  Hj(1,3) = 0;
-  Hj(2,0) = py * (vx * py - vy * px) / norm3;
-  Hj(2,1) = px * (vy * px - vx * py) / norm3;
-  Hj(2,2) = px / norm;
-  Hj(2,3) = py / norm;
 
   return Hj;
 }
